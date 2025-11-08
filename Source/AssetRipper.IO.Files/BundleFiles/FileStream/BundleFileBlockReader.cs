@@ -110,7 +110,11 @@ internal sealed class BundleFileBlockReader : IDisposable
 							break;
 
 						case CompressionType.Lzham:
-							UnsupportedBundleDecompression.ThrowLzham(entry.PathFixed);
+							uint uncompressedSize1 = block.UncompressedSize;
+							byte[] uncompressedBytes1 = new byte[uncompressedSize1];
+							byte[] compressedBytes1 = new BinaryReader(m_stream).ReadBytes((int)block.CompressedSize);
+							AssetStudio.LZ4Inv.Instance.Decompress(compressedBytes1, uncompressedBytes1);
+							new MemoryStream(uncompressedBytes1).CopyTo(m_cachedBlockStream);
 							break;
 
 						default:
